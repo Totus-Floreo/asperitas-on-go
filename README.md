@@ -1,5 +1,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/Totus-Floreo/asperitas-on-go)](https://goreportcard.com/report/github.com/Totus-Floreo/asperitas-on-go)
 [![Go](https://github.com/Totus-Floreo/asperitas-on-go/actions/workflows/go.yml/badge.svg)](https://github.com/Totus-Floreo/asperitas/blob/main/.github/workflows/go.yml)
+[![Status](https://badgen.net/badge/status/indevelopment/blue?icon=github)](https://github.com/Totus-Floreo/asperitas-on-go)
+[![MIT](https://badgen.net/badge/license/MIT/blue)](https://github.com/Totus-Floreo/asperitas-on-go/blob/main/LICENSE)
 # asperitas-go
 Simple reddit-clone based on [Asperitas](https://github.com/d11z/asperitas) js-front and my golang-backend
 
