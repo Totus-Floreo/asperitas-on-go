@@ -1,3 +1,4 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/Totus-Floreo/asperitas-on-go)](https://goreportcard.com/report/github.com/Totus-Floreo/asperitas-on-go)
 # asperitas-go
 Simple reddit-clone based on [Asperitas](https://github.com/d11z/asperitas) js-front and my golang-backend
 
