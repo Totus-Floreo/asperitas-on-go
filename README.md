@@ -25,3 +25,6 @@ go run ./cmd/asperitas/main.go
 ## Thanks
 Thank [d11z](https://github.com/d11z/asperitas) for the idea and frontend.
 
+## License
+This project is made available under the **MIT License**.
+
