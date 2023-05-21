@@ -15,7 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-
+    - uses: supercharge/redis-github-action@1.5.0
+      with:
+        redis-port: 32768
+        
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
