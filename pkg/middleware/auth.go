@@ -7,11 +7,16 @@ import (
 	"net/http"
 
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
-
 	"github.com/gorilla/mux"
 )
 
-func Auth(jwtService model.IJWTService) mux.MiddlewareFunc {
+type AuthContextKey string
+
+const (
+	AuthorContextKey AuthContextKey = "author"
+)
+
+func Auth(jwtService model.IJWTService, tokenStorage model.ITokenStorage) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authHeader := r.Header.Get("Authorization")
@@ -23,7 +28,6 @@ func Auth(jwtService model.IJWTService) mux.MiddlewareFunc {
 			token := authHeader[len("Bearer "):]
 			author, err := jwtService.VerifyToken(token)
 			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
 				resp, errMarshal := json.Marshal(map[string]interface{}{"message": "no auth"})
 				if errMarshal != nil {
 					w.WriteHeader(http.StatusInternalServerError)
@@ -37,10 +41,30 @@ func Auth(jwtService model.IJWTService) mux.MiddlewareFunc {
 					fmt.Print("auth: body write error")
 					return
 				}
-				http.Redirect(w, r, "/", http.StatusFound)
+				http.Redirect(w, r, "/", http.StatusUnauthorized)
 				return
 			}
-			ctx := context.WithValue(r.Context(), "author", author)
+			//  i don't shure about this block, but rn i have no idea how to do this
+			dbtoken, err := tokenStorage.GetToken(r.Context(), author.ID)
+			if err != nil || dbtoken != token {
+				resp, errMarshal := json.Marshal(map[string]interface{}{"message": "bad token"})
+				if errMarshal != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					fmt.Print("auth: marsh error")
+					return
+				}
+
+				_, errWrite := w.Write(resp)
+				if errWrite != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					fmt.Print("auth: body write error")
+					return
+				}
+				http.Redirect(w, r, "/", http.StatusUnauthorized)
+				return
+			}
+			// end of conversation
+			ctx := context.WithValue(r.Context(), AuthorContextKey, author)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

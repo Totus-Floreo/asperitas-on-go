@@ -9,6 +9,8 @@ import (
 	route "github.com/Totus-Floreo/asperitas-on-go/pkg/delivery/http"
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/middleware"
 	repository "github.com/Totus-Floreo/asperitas-on-go/pkg/repository/inmemory"
+	repositoryRedis "github.com/Totus-Floreo/asperitas-on-go/pkg/repository/redis"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
@@ -19,9 +21,16 @@ func main() {
 	defer zapLogger.Sync()
 	logger := zapLogger.Sugar()
 
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:32768",
+		Password: "",
+		DB:       0,
+	})
+
 	userRepository := repository.NewUserStorage()
+	tokenRepository := repositoryRedis.NewTokenRepository(rdb)
 	JWTService := application.NewJWTService(os.Getenv("signature"))
-	authService := application.NewAuthService(userRepository, JWTService)
+	authService := application.NewAuthService(userRepository, tokenRepository, JWTService)
 
 	userHandler := &route.UserHandler{
 		Logger:      logger,
@@ -52,7 +61,7 @@ func main() {
 
 	apiAuth := router.PathPrefix("/api").Subrouter()
 
-	apiAuth.Use(middleware.Auth(JWTService))
+	apiAuth.Use(middleware.Auth(JWTService, tokenRepository))
 	apiAuth.HandleFunc("/posts", postHandler.AddPost).Methods("POST")
 	apiAuth.HandleFunc("/post/{id}", postHandler.DeletePost).Methods("DELETE")
 	apiAuth.HandleFunc("/post/{id}", postHandler.AddComment).Methods("POST")
