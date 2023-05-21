@@ -21,7 +21,8 @@ func (h *UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	token, err := h.AuthService.SignUp(user.Username, user.Password)
+	ctx := r.Context()
+	token, err := h.AuthService.SignUp(ctx, user.Username, user.Password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
@@ -46,7 +47,8 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := h.AuthService.LogIn(user.Username, user.Password)
+	ctx := r.Context()
+	token, err := h.AuthService.LogIn(ctx, user.Username, user.Password)
 	if err != nil {
 		if err == model.ErrInvalidCredentials {
 			http.Error(w, `{"message": "invalid username or password"}`, http.StatusUnauthorized)
