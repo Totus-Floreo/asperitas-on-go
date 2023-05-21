@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/application"
+	"github.com/Totus-Floreo/asperitas-on-go/pkg/middleware"
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
 
 	"github.com/gorilla/mux"
@@ -101,7 +102,7 @@ func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	post.Author = r.Context().Value("author").(*model.Author)
+	post.Author = r.Context().Value(middleware.AuthorContextKey).(*model.Author)
 	post, err := h.PostService.AddPost(post)
 	if err == model.ErrInvalidUrl {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
@@ -126,7 +127,7 @@ func (h *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"message":"invalid post id"}`, http.StatusUnprocessableEntity)
 		return
 	}
-	author := r.Context().Value("author").(*model.Author)
+	author := r.Context().Value(middleware.AuthorContextKey).(*model.Author)
 	msg, err := h.PostService.DeletePost(postID, author)
 	if err != nil {
 		http.Error(w, msg, http.StatusNotFound)
@@ -157,7 +158,7 @@ func (h *PostHandler) AddComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	author := r.Context().Value("author").(*model.Author)
+	author := r.Context().Value(middleware.AuthorContextKey).(*model.Author)
 
 	post, err := h.PostService.AddComment(postID, comment, author)
 	if err != nil {
@@ -186,7 +187,7 @@ func (h *PostHandler) DeleteComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	author := r.Context().Value("author").(*model.Author)
+	author := r.Context().Value(middleware.AuthorContextKey).(*model.Author)
 
 	post, err := h.PostService.DeleteComment(postID, commentID, author)
 	if err == model.ErrUnAuthorized {
@@ -212,7 +213,7 @@ func (h *PostHandler) Vote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	author := r.Context().Value("author").(*model.Author)
+	author := r.Context().Value(middleware.AuthorContextKey).(*model.Author)
 
 	post, err := h.PostService.Vote(postID, author, filepath.Base(filepath.Clean(r.URL.Path)))
 	if err != nil {
