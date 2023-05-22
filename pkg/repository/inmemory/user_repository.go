@@ -19,9 +19,9 @@ func NewUserStorage() *UserStorage {
 	}
 }
 
-func (s *UserStorage) GetUser(username string) (*model.User, error) {
+func (s *UserStorage) GetUser(userID string) (*model.User, error) {
 	for _, user := range s.Storage {
-		if user.Username == username {
+		if user.ID == userID {
 			return user, nil
 		}
 	}
