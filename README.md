@@ -23,6 +23,16 @@ func <your_func>() {
 ```sh
 go run ./cmd/asperitas/main.go
 ```
+### OR
+Run the app with commandline set environments for one session
+### Linux
+```sh
+signature=secretkey port=:3010 go run ./cmd/asperitas/main.go
+```
+### Windows
+```sh
+$env:signature="secretkey"; $env:port=":3010"; go run ./cmd/asperitas/main.go
+```
 
 ## Thanks
 Thank [d11z](https://github.com/d11z/asperitas) for the idea and frontend.
