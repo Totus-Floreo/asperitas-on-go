@@ -41,7 +41,7 @@ func Auth(jwtService model.IJWTService, tokenStorage model.ITokenStorage) mux.Mi
 					fmt.Print("auth: body write error")
 					return
 				}
-				http.Redirect(w, r, "/", http.StatusUnauthorized)
+				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 			//  i don't shure about this block, but rn i have no idea how to do this
@@ -60,7 +60,7 @@ func Auth(jwtService model.IJWTService, tokenStorage model.ITokenStorage) mux.Mi
 					fmt.Print("auth: body write error")
 					return
 				}
-				http.Redirect(w, r, "/", http.StatusUnauthorized)
+				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 			// end of conversation
