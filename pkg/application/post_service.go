@@ -106,7 +106,9 @@ func (s *PostService) AddComment(postID string, body string, author *model.Autho
 	}
 
 	comment := model.NewComment(body, author)
-	s.postStorage.AddComment(post, comment)
+	if err := s.postStorage.AddComment(post, comment); err != nil {
+		return nil, err
+	}
 
 	postChanged, err := s.postStorage.GetPostByID(postID)
 	if err != nil {
