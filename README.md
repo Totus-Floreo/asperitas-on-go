@@ -27,11 +27,11 @@ go run ./cmd/asperitas/main.go
 Run the app with commandline set environments for one session
 ### Linux
 ```sh
-signature=secretkey port=:3010 go run ./cmd/asperitas/main.go
+signature=<Your_signature> port=:<Your_port> go run ./cmd/asperitas/main.go
 ```
 ### Windows
 ```sh
-$env:signature="secretkey"; $env:port=":3010"; go run ./cmd/asperitas/main.go
+$env:signature="<Your_signature>"; $env:port=":<Your_port>"; go run ./cmd/asperitas/main.go
 ```
 
 ## Thanks
