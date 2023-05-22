@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/application"
+	"github.com/Totus-Floreo/asperitas-on-go/pkg/delivery/helpers"
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/middleware"
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
 
@@ -26,10 +27,7 @@ func (h *PostHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := SendResponse(w, http.StatusOK, posts); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	helpers.SendResponse(w, http.StatusOK, posts)
 }
 
 func (h *PostHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
@@ -47,10 +45,7 @@ func (h *PostHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := SendResponse(w, http.StatusOK, post); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	helpers.SendResponse(w, http.StatusOK, post)
 }
 
 func (h *PostHandler) GetPostsByCategory(w http.ResponseWriter, r *http.Request) {
@@ -68,10 +63,7 @@ func (h *PostHandler) GetPostsByCategory(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if err := SendResponse(w, http.StatusOK, posts); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	helpers.SendResponse(w, http.StatusOK, posts)
 }
 
 func (h *PostHandler) GetPostsByUser(w http.ResponseWriter, r *http.Request) {
@@ -89,10 +81,7 @@ func (h *PostHandler) GetPostsByUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := SendResponse(w, http.StatusOK, posts); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	helpers.SendResponse(w, http.StatusOK, posts)
 }
 
 func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
@@ -113,10 +102,7 @@ func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := SendResponse(w, http.StatusCreated, post); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	helpers.SendResponse(w, http.StatusCreated, post)
 }
 
 func (h *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
@@ -166,10 +152,7 @@ func (h *PostHandler) AddComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := SendResponse(w, http.StatusCreated, post); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	helpers.SendResponse(w, http.StatusCreated, post)
 }
 
 func (h *PostHandler) DeleteComment(w http.ResponseWriter, r *http.Request) {
@@ -198,10 +181,8 @@ func (h *PostHandler) DeleteComment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if err := SendResponse(w, http.StatusOK, post); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+
+	helpers.SendResponse(w, http.StatusOK, post)
 }
 
 func (h *PostHandler) Vote(w http.ResponseWriter, r *http.Request) {
@@ -221,23 +202,5 @@ func (h *PostHandler) Vote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := SendResponse(w, http.StatusOK, post); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-func SendResponse(w http.ResponseWriter, status int, data interface{}) error {
-	// w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	response, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-	_, err = w.Write(response)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return err
-	}
-	return nil
+	helpers.SendResponse(w, http.StatusOK, post)
 }
