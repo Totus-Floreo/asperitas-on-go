@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -25,45 +24,20 @@ func Auth(jwtService model.IJWTService, tokenStorage model.ITokenStorage) mux.Mi
 				fmt.Print("auth: no token")
 				return
 			}
+
 			token := authHeader[len("Bearer "):]
 			author, err := jwtService.VerifyToken(token)
 			if err != nil {
-				resp, errMarshal := json.Marshal(map[string]interface{}{"message": "no auth"})
-				if errMarshal != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					fmt.Print("auth: marsh error")
-					return
-				}
-
-				_, errWrite := w.Write(resp)
-				if errWrite != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					fmt.Print("auth: body write error")
-					return
-				}
-				w.WriteHeader(http.StatusUnauthorized)
+				http.Error(w, `{"message": "no auth"}`, http.StatusUnauthorized)
 				return
 			}
-			//  i don't shure about this block, but rn i have no idea how to do this
+
 			dbtoken, err := tokenStorage.GetToken(r.Context(), author.ID)
 			if err != nil || dbtoken != token {
-				resp, errMarshal := json.Marshal(map[string]interface{}{"message": "bad token"})
-				if errMarshal != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					fmt.Print("auth: marsh error")
-					return
-				}
-
-				_, errWrite := w.Write(resp)
-				if errWrite != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					fmt.Print("auth: body write error")
-					return
-				}
-				w.WriteHeader(http.StatusUnauthorized)
+				http.Error(w, `{"message": "bad token"}`, http.StatusUnauthorized)
 				return
 			}
-			// end of conversation
+
 			ctx := context.WithValue(r.Context(), AuthorContextKey, author)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
