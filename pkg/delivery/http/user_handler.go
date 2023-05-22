@@ -26,7 +26,7 @@ func (h *UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	token, err := h.AuthService.SignUp(ctx, user.Username, user.Password)
 	if err == model.ErrUserExist {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 	if err != nil {
