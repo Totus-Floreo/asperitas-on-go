@@ -13,7 +13,7 @@ var (
 	ErrPostCategoryInvalidHTTP = errors.New(`{"message":"invalid post category"}`)
 	ErrCommentInvalidHTTP      = errors.New(`{"message":"invalid comment id"}`)
 	ErrUserInvalidHTTP         = errors.New(`{"message":"invalid user name"}`)
-	ErrInvalidCredentialsHTTP  = errors.New(`{"message": "invalid username or password"}`)
+	ErrInvalidCredentialsHTTP  = errors.New(`{"message":"invalid username or password"}`)
 
 	// HTTPErrNullComment = errors.New(`{"errors":[{"location":"body","param":"comment","msg":"is required"}]}`)
 

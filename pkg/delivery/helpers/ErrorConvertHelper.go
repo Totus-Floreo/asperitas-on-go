@@ -6,8 +6,6 @@ func HTTPError(err error) string {
 	switch err {
 	case model.ErrPostNotFound:
 		return model.ErrPostInvalidHTTP.Error()
-	case model.ErrPostNotFound:
-		return model.ErrPostInvalidHTTP.Error()
 	case model.ErrInvalidCredentials:
 		return model.ErrInvalidCredentialsHTTP.Error()
 	case model.ErrUnAuthorized:

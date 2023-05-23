@@ -145,7 +145,7 @@ func (h *PostHandler) AddComment(w http.ResponseWriter, r *http.Request) {
 	}
 	comment, ok := data["comment"]
 	if !ok {
-		msg, err := model.NewErrorStack("body", "comment", "", "already exists")
+		msg, err := model.NewErrorStack("body", "comment", "", "is required")
 		if err != nil {
 			http.Error(w, helpers.HTTPError(err), http.StatusInternalServerError)
 		}
