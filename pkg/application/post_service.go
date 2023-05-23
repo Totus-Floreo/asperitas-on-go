@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
 )
@@ -106,6 +107,10 @@ func (s *PostService) AddComment(postID string, body string, author *model.Autho
 	post, err := s.postStorage.GetPostByID(postID)
 	if err != nil {
 		return nil, err
+	}
+
+	if utf8.RuneCountInString(body) > 2000 {
+		return nil, model.ErrCommentTooLong
 	}
 
 	comment := model.NewComment(body, author)
