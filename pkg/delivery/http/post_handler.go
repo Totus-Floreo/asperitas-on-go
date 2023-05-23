@@ -92,7 +92,7 @@ func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	post.Author = r.Context().Value(middleware.AuthorContextKey).(*model.Author)
-	post, err := h.PostService.AddPost(post)
+	response, err := h.PostService.AddPost(post)
 	if err == model.ErrInvalidUrl {
 		msg, err := model.NewErrorStack("body", "url", post.Url, "is invalid")
 		if err != nil {
@@ -107,7 +107,7 @@ func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	helpers.SendResponse(w, http.StatusCreated, post)
+	helpers.SendResponse(w, http.StatusCreated, response)
 }
 
 func (h *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {

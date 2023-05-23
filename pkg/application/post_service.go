@@ -4,6 +4,8 @@ import (
 	"errors"
 	"net/http"
 	"sort"
+	"strings"
+	"time"
 
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
 )
@@ -71,6 +73,7 @@ func (s *PostService) GetPostsByUser(userName string) ([]*model.Post, error) {
 
 func (s *PostService) AddPost(post *model.Post) (*model.Post, error) {
 	if post.Url != "" {
+		post.Url = strings.TrimSpace(post.Url)
 		if work := checkLink(post.Url); !work {
 			return nil, model.ErrInvalidUrl
 		}
@@ -190,7 +193,11 @@ func (s *PostService) Vote(postID string, author *model.Author, method string) (
 }
 
 func checkLink(link string) bool {
-	resp, err := http.Get(link)
+	client := &http.Client{
+		Timeout: 5 * time.Second,
+	}
+
+	resp, err := client.Get(link)
 	if err != nil {
 		return false
 	}
