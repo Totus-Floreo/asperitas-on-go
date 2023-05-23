@@ -26,7 +26,7 @@ func (s *UserStorage) GetUser(username string) (*model.User, error) {
 		}
 	}
 
-	return nil, model.ErrUserExist
+	return nil, model.ErrUserNotFound
 }
 
 func (s *UserStorage) AddUser(user *model.User) error {

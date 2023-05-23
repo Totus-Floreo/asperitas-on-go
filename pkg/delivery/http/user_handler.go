@@ -31,7 +31,7 @@ func (h *UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, helpers.HTTPError(err), http.StatusInternalServerError)
 			return
 		}
-		http.Error(w, msg, http.StatusNotFound)
+		http.Error(w, msg, http.StatusUnprocessableEntity)
 		return
 	}
 	if err != nil {
