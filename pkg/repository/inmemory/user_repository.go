@@ -1,6 +1,7 @@
-package repository
+package inmemory
 
 import (
+	"context"
 	"sync"
 
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
@@ -19,7 +20,7 @@ func NewUserStorage() *UserStorage {
 	}
 }
 
-func (s *UserStorage) GetUser(userID string) (*model.User, error) {
+func (s *UserStorage) GetUser(ctx context.Context, userID string) (*model.User, error) {
 	for _, user := range s.Storage {
 		if user.ID == userID {
 			return user, nil
@@ -29,7 +30,7 @@ func (s *UserStorage) GetUser(userID string) (*model.User, error) {
 	return nil, model.ErrUserNotFound
 }
 
-func (s *UserStorage) AddUser(user *model.User) error {
+func (s *UserStorage) AddUser(ctx context.Context, user *model.User) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
