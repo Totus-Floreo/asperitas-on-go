@@ -148,6 +148,7 @@ func (h *PostHandler) AddComment(w http.ResponseWriter, r *http.Request) {
 		msg, err := model.NewErrorStack("body", "comment", "", "is required")
 		if err != nil {
 			http.Error(w, helpers.HTTPError(err), http.StatusInternalServerError)
+			return
 		}
 		http.Error(w, msg, http.StatusUnprocessableEntity)
 		return
