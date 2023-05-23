@@ -3,8 +3,8 @@ package repository
 import (
 	"sync"
 
-	"github.com/Totus-Floreo/asperitas-on-go/pkg/hashtool"
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
+	uuid "github.com/google/uuid"
 )
 
 type UserStorage struct {
@@ -26,14 +26,14 @@ func (s *UserStorage) GetUser(userID string) (*model.User, error) {
 		}
 	}
 
-	return nil, model.ErrUserExist
+	return nil, model.ErrUserNotFound
 }
 
 func (s *UserStorage) AddUser(user *model.User) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	user.ID = hashtool.CalculateMD5Hash(len(s.Storage))
+	user.ID = uuid.New().String()
 	s.Storage[user.Username] = user
 	return nil
 }

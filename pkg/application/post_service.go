@@ -4,6 +4,8 @@ import (
 	"errors"
 	"net/http"
 	"sort"
+	"strings"
+	"time"
 
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
 )
@@ -71,6 +73,7 @@ func (s *PostService) GetPostsByUser(userName string) ([]*model.Post, error) {
 
 func (s *PostService) AddPost(post *model.Post) (*model.Post, error) {
 	if post.Url != "" {
+		post.Url = strings.TrimSpace(post.Url)
 		if work := checkLink(post.Url); !work {
 			return nil, model.ErrInvalidUrl
 		}
@@ -86,17 +89,17 @@ func (s *PostService) AddPost(post *model.Post) (*model.Post, error) {
 	}
 }
 
-func (s *PostService) DeletePost(postID string, author *model.Author) (string, error) {
+func (s *PostService) DeletePost(postID string, author *model.Author) error {
 	if post, err := s.postStorage.GetPostByID(postID); err != nil {
-		return `{"message": "post not found"}`, err
+		return err
 	} else if post.Author.ID != author.ID {
-		return `{"message":"unauthorized"}`, model.ErrUnAuthorized
+		return model.ErrUnAuthorized
 	}
 	err := s.postStorage.DeletePost(postID)
 	if err != nil {
-		return `{"message":"bad connection to db"}`, err
+		return err
 	}
-	return `{"message":"success"}`, nil
+	return nil
 }
 
 func (s *PostService) AddComment(postID string, body string, author *model.Author) (*model.Post, error) {
@@ -106,7 +109,9 @@ func (s *PostService) AddComment(postID string, body string, author *model.Autho
 	}
 
 	comment := model.NewComment(body, author)
-	s.postStorage.AddComment(post, comment)
+	if err := s.postStorage.AddComment(post, comment); err != nil {
+		return nil, err
+	}
 
 	postChanged, err := s.postStorage.GetPostByID(postID)
 	if err != nil {
@@ -188,7 +193,11 @@ func (s *PostService) Vote(postID string, author *model.Author, method string) (
 }
 
 func checkLink(link string) bool {
-	resp, err := http.Get(link)
+	client := &http.Client{
+		Timeout: 5 * time.Second,
+	}
+
+	resp, err := client.Get(link)
 	if err != nil {
 		return false
 	}

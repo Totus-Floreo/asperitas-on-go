@@ -3,8 +3,8 @@ package repository
 import (
 	"sync"
 
-	"github.com/Totus-Floreo/asperitas-on-go/pkg/hashtool"
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
+	uuid "github.com/google/uuid"
 )
 
 type PostStorage struct {
@@ -61,7 +61,7 @@ func (s *PostStorage) AddPost(post *model.Post) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	post.ID = hashtool.CalculateMD5Hash(len(s.Storage))
+	post.ID = uuid.New().String()
 	s.Storage = append(s.Storage, post)
 
 	return nil
@@ -114,7 +114,7 @@ func (s *PostStorage) AddComment(post *model.Post, comment *model.Comment) error
 	post.CM.Lock()
 	defer post.CM.Unlock()
 
-	comment.ID = hashtool.CalculateMD5Hash(len(post.Comments))
+	comment.ID = uuid.New().String()
 	post.Comments = append(post.Comments, comment)
 
 	return nil
