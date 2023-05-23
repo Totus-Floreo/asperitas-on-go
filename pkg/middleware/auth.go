@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
@@ -20,21 +19,20 @@ func Auth(jwtService model.IJWTService, tokenStorage model.ITokenStorage) mux.Mi
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
-				w.WriteHeader(http.StatusUnauthorized)
-				fmt.Print("auth: no token")
+				http.Error(w, model.ErrUnAuthorizedHTTP.Error(), http.StatusUnauthorized)
 				return
 			}
 
 			token := authHeader[len("Bearer "):]
 			author, err := jwtService.VerifyToken(token)
 			if err != nil {
-				http.Error(w, `{"message": "no auth"}`, http.StatusUnauthorized)
+				http.Error(w, model.ErrUnAuthorizedHTTP.Error(), http.StatusUnauthorized)
 				return
 			}
 
 			dbtoken, err := tokenStorage.GetToken(r.Context(), author.ID)
 			if err != nil || dbtoken != token {
-				http.Error(w, `{"message": "bad token"}`, http.StatusUnauthorized)
+				http.Error(w, model.ErrUnAuthorizedHTTP.Error(), http.StatusUnauthorized)
 				return
 			}
 
