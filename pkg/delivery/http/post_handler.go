@@ -35,13 +35,13 @@ func (h *PostHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	postID, found := vars["postID"]
 	if !found {
-		http.Error(w, `{"message":"invalid post id"}`, http.StatusUnprocessableEntity)
+		http.Error(w, model.ErrPostInvalidHTTP.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	post, err := h.PostService.GetPostByID(postID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, helpers.HTTPError(err), http.StatusNotFound)
 		return
 	}
 
@@ -53,13 +53,13 @@ func (h *PostHandler) GetPostsByCategory(w http.ResponseWriter, r *http.Request)
 	vars := mux.Vars(r)
 	postCategory, found := vars["category"]
 	if !found {
-		http.Error(w, `{"message":"invalid post id"}`, http.StatusUnprocessableEntity)
+		http.Error(w, model.ErrPostCategoryInvalidHTTP.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	posts, err := h.PostService.GetPostsByCategory(postCategory)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, helpers.HTTPError(err), http.StatusInternalServerError)
 		return
 	}
 
@@ -71,13 +71,13 @@ func (h *PostHandler) GetPostsByUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userName, found := vars["user"]
 	if !found {
-		http.Error(w, `{"message":"invalid user name"}`, http.StatusUnprocessableEntity)
+		http.Error(w, model.ErrUserInvalidHTTP.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	posts, err := h.PostService.GetPostsByUser(userName)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, helpers.HTTPError(err), http.StatusInternalServerError)
 		return
 	}
 
@@ -88,17 +88,22 @@ func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	post := model.NewPost()
 	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, helpers.HTTPError(err), http.StatusBadRequest)
 		return
 	}
 	post.Author = r.Context().Value(middleware.AuthorContextKey).(*model.Author)
 	post, err := h.PostService.AddPost(post)
 	if err == model.ErrInvalidUrl {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		msg, err := model.NewErrorStack("body", "url", post.Url, "is invalid")
+		if err != nil {
+			http.Error(w, helpers.HTTPError(err), http.StatusUnprocessableEntity)
+			return
+		}
+		http.Error(w, msg, http.StatusUnprocessableEntity)
 		return
 	}
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, helpers.HTTPError(err), http.StatusBadRequest)
 		return
 	}
 
@@ -110,13 +115,13 @@ func (h *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	postID, found := vars["id"]
 	if !found {
-		http.Error(w, `{"message":"invalid post id"}`, http.StatusUnprocessableEntity)
+		http.Error(w, model.ErrPostInvalidHTTP.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 	author := r.Context().Value(middleware.AuthorContextKey).(*model.Author)
-	msg, err := h.PostService.DeletePost(postID, author)
+	err := h.PostService.DeletePost(postID, author)
 	if err != nil {
-		http.Error(w, msg, http.StatusNotFound)
+		http.Error(w, helpers.HTTPError(err), http.StatusNotFound)
 		return
 	}
 
@@ -129,7 +134,7 @@ func (h *PostHandler) AddComment(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	postID, found := vars["id"]
 	if !found {
-		http.Error(w, `{"message":"invalid post id"}`, http.StatusUnprocessableEntity)
+		http.Error(w, model.ErrPostInvalidHTTP.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -140,7 +145,11 @@ func (h *PostHandler) AddComment(w http.ResponseWriter, r *http.Request) {
 	}
 	comment, ok := data["comment"]
 	if !ok {
-		http.Error(w, model.ErrNullComment.Error(), http.StatusUnprocessableEntity)
+		msg, err := model.NewErrorStack("body", "comment", "", "already exists")
+		if err != nil {
+			http.Error(w, helpers.HTTPError(err), http.StatusInternalServerError)
+		}
+		http.Error(w, msg, http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -148,7 +157,7 @@ func (h *PostHandler) AddComment(w http.ResponseWriter, r *http.Request) {
 
 	post, err := h.PostService.AddComment(postID, comment, author)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, helpers.HTTPError(err), http.StatusNotFound)
 		return
 	}
 
@@ -160,25 +169,21 @@ func (h *PostHandler) DeleteComment(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	postID, found := vars["postID"]
 	if !found {
-		http.Error(w, `{"message":"invalid post id"}`, http.StatusUnprocessableEntity)
+		http.Error(w, model.ErrPostInvalidHTTP.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	commentID, found := vars["commentID"]
 	if !found {
-		http.Error(w, `{"message":"invalid commend id"}`, http.StatusUnprocessableEntity)
+		http.Error(w, model.ErrCommentInvalidHTTP.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
 	author := r.Context().Value(middleware.AuthorContextKey).(*model.Author)
 
 	post, err := h.PostService.DeleteComment(postID, commentID, author)
-	if err == model.ErrUnAuthorized {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, helpers.HTTPError(err), http.StatusBadRequest)
 		return
 	}
 
@@ -190,7 +195,7 @@ func (h *PostHandler) Vote(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	postID, found := vars["postID"]
 	if !found {
-		http.Error(w, `{"message":"invalid post id"}`, http.StatusUnprocessableEntity)
+		http.Error(w, model.ErrPostInvalidHTTP.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -198,7 +203,7 @@ func (h *PostHandler) Vote(w http.ResponseWriter, r *http.Request) {
 
 	post, err := h.PostService.Vote(postID, author, filepath.Base(filepath.Clean(r.URL.Path)))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, helpers.HTTPError(err), http.StatusBadRequest)
 		return
 	}
 

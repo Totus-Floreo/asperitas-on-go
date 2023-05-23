@@ -86,17 +86,17 @@ func (s *PostService) AddPost(post *model.Post) (*model.Post, error) {
 	}
 }
 
-func (s *PostService) DeletePost(postID string, author *model.Author) (string, error) {
+func (s *PostService) DeletePost(postID string, author *model.Author) error {
 	if post, err := s.postStorage.GetPostByID(postID); err != nil {
-		return `{"message": "post not found"}`, err
+		return err
 	} else if post.Author.ID != author.ID {
-		return `{"message":"unauthorized"}`, model.ErrUnAuthorized
+		return model.ErrUnAuthorized
 	}
 	err := s.postStorage.DeletePost(postID)
 	if err != nil {
-		return `{"message":"bad connection to db"}`, err
+		return err
 	}
-	return `{"message":"success"}`, nil
+	return nil
 }
 
 func (s *PostService) AddComment(postID string, body string, author *model.Author) (*model.Post, error) {

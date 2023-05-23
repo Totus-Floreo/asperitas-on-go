@@ -24,7 +24,7 @@ func NewAuthService(userStorage model.IUserStorage, tokenStorage model.ITokenSto
 
 func (s *AuthService) SignUp(ctx context.Context, username string, password string) (string, error) {
 	if _, err := s.userStorage.GetUser(username); err == nil {
-		return "", model.ErrUserExist
+		return "", err
 	}
 
 	user := &model.User{

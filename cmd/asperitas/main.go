@@ -22,7 +22,7 @@ func main() {
 	logger := zapLogger.Sugar()
 
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:32768",
+		Addr:     "localhost:32770",
 		Password: "",
 		DB:       0,
 	})
