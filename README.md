@@ -16,9 +16,18 @@ import "os"
 func <your_func>() {
     Os.Setenv("signature", "<Your_signature>")
     Os.Setenv("port", "<Your_port>")
+    Os.Setenv("redis", "<Your_redis_port>")
 }
 ```
-
+if you use a non local redis db, needs setup this block in ./cmd/asperitas/main.go
+```go
+rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost" + os.Getenv("redis"),
+		Password: "",
+		DB:       0,
+	})
+    
+```
 ### Run the app
 ```sh
 go run ./cmd/asperitas/main.go
@@ -27,11 +36,11 @@ go run ./cmd/asperitas/main.go
 Run the app with commandline set environments for one session
 ### Linux
 ```sh
-signature=<Your_signature> port=:<Your_port> go run ./cmd/asperitas/main.go
+signature=<Your_signature> port=:<Your_port> redis=:<Your_redis_port> go run ./cmd/asperitas/main.go
 ```
 ### Windows
 ```sh
-$env:signature="<Your_signature>"; $env:port=":<Your_port>"; go run ./cmd/asperitas/main.go
+$env:signature="<Your_signature>"; $env:port=":<Your_port>"; $env:redis=":<Your_redis_port>"; go run ./cmd/asperitas/main.go
 ```
 
 ## Thanks
