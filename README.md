@@ -2,6 +2,10 @@
 [![Go](https://github.com/Totus-Floreo/asperitas-on-go/actions/workflows/go.yml/badge.svg)](https://github.com/Totus-Floreo/asperitas/blob/main/.github/workflows/go.yml)
 [![Status](https://badgen.net/badge/status/indevelopment/blue?icon=github)](https://github.com/Totus-Floreo/asperitas-on-go)
 [![MIT](https://badgen.net/badge/license/MIT/blue)](https://github.com/Totus-Floreo/asperitas-on-go/blob/main/LICENSE)
+
+[![Branch](https://badgen.net/badge/branch/pgx-for-users/cyan?icon=github)](https://github.com/Totus-Floreo/asperitas-on-go/tree/pgx-for-users)
+[![Dev](https://github.com/Totus-Floreo/asperitas-on-go/actions/workflows/go.yml/badge.svg)](https://github.com/Totus-Floreo/asperitas/blob/pgx-for-users/.github/workflows/go.yml)
+
 # asperitas-go
 Simple reddit-clone based on [Asperitas](https://github.com/d11z/asperitas) js-front and my golang-backend
 
