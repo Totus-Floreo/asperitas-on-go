@@ -1,5 +1,7 @@
 package model
 
+import "context"
+
 type User struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`
@@ -12,6 +14,6 @@ type Author struct {
 }
 
 type IUserStorage interface {
-	GetUser(string) (*User, error)
-	AddUser(*User) error
+	GetUser(context.Context, string) (*User, error)
+	AddUser(context.Context, *User) error
 }

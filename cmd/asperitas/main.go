@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
@@ -8,8 +9,10 @@ import (
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/application"
 	route "github.com/Totus-Floreo/asperitas-on-go/pkg/delivery/http"
 	"github.com/Totus-Floreo/asperitas-on-go/pkg/middleware"
-	repository "github.com/Totus-Floreo/asperitas-on-go/pkg/repository/inmemory"
+	inmemory "github.com/Totus-Floreo/asperitas-on-go/pkg/repository/inmemory"
+	"github.com/Totus-Floreo/asperitas-on-go/pkg/repository/pgx"
 	repositoryRedis "github.com/Totus-Floreo/asperitas-on-go/pkg/repository/redis"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/gorilla/mux"
@@ -27,7 +30,14 @@ func main() {
 		DB:       0,
 	})
 
-	userRepository := repository.NewUserStorage()
+	postgreUrl := "postgres://" + os.Getenv("pg_url")
+	pgxdb, err := pgxpool.New(context.Background(), postgreUrl)
+	if err != nil {
+		panic(err)
+	}
+
+	// userRepository := inmemory.NewUserStorage()
+	userRepository := pgx.NewUserStorage(pgxdb)
 	tokenRepository := repositoryRedis.NewTokenRepository(rdb)
 	JWTService := application.NewJWTService(os.Getenv("signature"))
 	authService := application.NewAuthService(userRepository, tokenRepository, JWTService)
@@ -37,7 +47,7 @@ func main() {
 		AuthService: authService,
 	}
 
-	postStorage := repository.NewPostStorage()
+	postStorage := inmemory.NewPostStorage()
 	postService := application.NewPostService(postStorage)
 
 	postHandler := &route.PostHandler{

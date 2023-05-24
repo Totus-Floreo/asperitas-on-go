@@ -21,6 +21,8 @@ var (
 
 	// HTTPErrInvalidUrl = errors.New(`{"errors":[{"location":"body","param":"url","value":"https:/broken.link/reallybad","msg":"is invalid"}]}`)
 
+	// HTTPErrCommentTooLong = errors.New(`{"errors":[{"location":"body","param":"comment","value":"over 2000 chars","msg":"must be at most 2000 characters long"}]}`)
+
 	ErrUnAuthorizedHTTP = errors.New(`{"message":"unuthorized"}`)
 )
 
@@ -67,4 +69,6 @@ var (
 	ErrInvalidSignMethod  = errors.New("invalid sign method")
 
 	ErrUnAuthorized = errors.New("unuthorized")
+
+	ErrCommentTooLong = errors.New("comment is too long")
 )

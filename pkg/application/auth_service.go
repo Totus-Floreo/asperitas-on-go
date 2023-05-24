@@ -23,7 +23,7 @@ func NewAuthService(userStorage model.IUserStorage, tokenStorage model.ITokenSto
 }
 
 func (s *AuthService) SignUp(ctx context.Context, username string, password string) (string, error) {
-	if _, err := s.userStorage.GetUser(username); err == nil {
+	if _, err := s.userStorage.GetUser(ctx, username); err == nil {
 		return "", model.ErrUserExist
 	}
 
@@ -31,7 +31,7 @@ func (s *AuthService) SignUp(ctx context.Context, username string, password stri
 		Username: username,
 		Password: password,
 	}
-	if err := s.userStorage.AddUser(user); err != nil {
+	if err := s.userStorage.AddUser(ctx, user); err != nil {
 		return "", err
 	}
 
@@ -47,7 +47,7 @@ func (s *AuthService) SignUp(ctx context.Context, username string, password stri
 }
 
 func (s *AuthService) LogIn(ctx context.Context, username, password string) (string, error) {
-	user, err := s.userStorage.GetUser(username)
+	user, err := s.userStorage.GetUser(ctx, username)
 	if err != nil {
 		return "", model.ErrInvalidCredentials
 	}

@@ -157,6 +157,15 @@ func (h *PostHandler) AddComment(w http.ResponseWriter, r *http.Request) {
 	author := r.Context().Value(middleware.AuthorContextKey).(*model.Author)
 
 	post, err := h.PostService.AddComment(postID, comment, author)
+	if err == model.ErrCommentTooLong {
+		msg, err := model.NewErrorStack("body", "comment", comment, "must be at most 2000 characters long")
+		if err != nil {
+			http.Error(w, helpers.HTTPError(err), http.StatusUnprocessableEntity)
+			return
+		}
+		http.Error(w, msg, http.StatusUnprocessableEntity)
+		return
+	}
 	if err != nil {
 		http.Error(w, helpers.HTTPError(err), http.StatusNotFound)
 		return

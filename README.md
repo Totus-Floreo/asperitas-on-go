@@ -2,6 +2,10 @@
 [![Go](https://github.com/Totus-Floreo/asperitas-on-go/actions/workflows/go.yml/badge.svg)](https://github.com/Totus-Floreo/asperitas/blob/main/.github/workflows/go.yml)
 [![Status](https://badgen.net/badge/status/indevelopment/blue?icon=github)](https://github.com/Totus-Floreo/asperitas-on-go)
 [![MIT](https://badgen.net/badge/license/MIT/blue)](https://github.com/Totus-Floreo/asperitas-on-go/blob/main/LICENSE)
+
+[![Branch](https://badgen.net/badge/branch/pgx-for-users/cyan?icon=github)](https://github.com/Totus-Floreo/asperitas-on-go/tree/pgx-for-users)
+[![Dev](https://github.com/Totus-Floreo/asperitas-on-go/actions/workflows/go.yml/badge.svg)](https://github.com/Totus-Floreo/asperitas/blob/pgx-for-users/.github/workflows/go.yml)
+
 # asperitas-go
 Simple reddit-clone based on [Asperitas](https://github.com/d11z/asperitas) js-front and my golang-backend
 
@@ -17,6 +21,7 @@ func <your_func>() {
     Os.Setenv("signature", "<Your_signature>")
     Os.Setenv("port", "<Your_port>")
     Os.Setenv("redis", "<Your_redis_port>")
+	Os.Serenv("pg_url", "<<username>:<password>@<host>:<port>/<database>>")
 }
 ```
 if you use a non local redis db, needs setup this block in ./cmd/asperitas/main.go
@@ -32,15 +37,22 @@ rdb := redis.NewClient(&redis.Options{
 ```sh
 go run ./cmd/asperitas/main.go
 ```
-### OR
-Run the app with commandline set environments for one session
-### Linux
+### Alternative method
+
+Create bash file and run
+
 ```sh
-signature=<Your_signature> port=:<Your_port> redis=:<Your_redis_port> go run ./cmd/asperitas/main.go
-```
-### Windows
-```sh
-$env:signature="<Your_signature>"; $env:port=":<Your_port>"; $env:redis=":<Your_redis_port>"; go run ./cmd/asperitas/main.go
+#Linux
+#!/bin/bash
+
+signature=<signature>
+port=:<port>
+redis=:<redis-port>
+pg_url=<<username>:<password>@<host>:<port>/<database>>
+
+export signature port redis pg_url
+
+go run ./cmd/asperitas/main.go
 ```
 
 ## Thanks
