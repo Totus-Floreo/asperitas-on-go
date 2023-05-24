@@ -37,6 +37,8 @@ github.com/jackc/pgx/v5/pgxpool
 ## explicit; go 1.19
 github.com/jackc/puddle/v2
 github.com/jackc/puddle/v2/internal/genstack
+# github.com/pkg/errors v0.9.1
+## explicit
 # github.com/redis/go-redis/v9 v9.0.4
 ## explicit; go 1.18
 github.com/redis/go-redis/v9
