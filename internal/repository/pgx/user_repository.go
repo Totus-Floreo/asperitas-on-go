@@ -1,10 +1,10 @@
-package pgx
+package pgx_repository
 
 import (
 	"context"
 	"log"
 
-	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
+	"github.com/Totus-Floreo/asperitas-on-go/internal/model"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"

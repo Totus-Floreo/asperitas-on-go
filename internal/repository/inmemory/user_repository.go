@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
+	"github.com/Totus-Floreo/asperitas-on-go/internal/model"
 	uuid "github.com/google/uuid"
 )
 

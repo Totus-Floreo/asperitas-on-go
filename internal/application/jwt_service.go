@@ -3,7 +3,7 @@ package application
 import (
 	"time"
 
-	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
+	"github.com/Totus-Floreo/asperitas-on-go/internal/model"
 
 	"github.com/golang-jwt/jwt/v5"
 )

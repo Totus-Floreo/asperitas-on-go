@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Totus-Floreo/asperitas-on-go/pkg/application"
-	"github.com/Totus-Floreo/asperitas-on-go/pkg/delivery/helpers"
-	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
+	"github.com/Totus-Floreo/asperitas-on-go/internal/application"
+	"github.com/Totus-Floreo/asperitas-on-go/internal/model"
+	"github.com/Totus-Floreo/asperitas-on-go/internal/route/helpers"
 
 	"go.uber.org/zap"
 )

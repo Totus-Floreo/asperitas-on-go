@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Totus-Floreo/asperitas-on-go/pkg/model"
+	"github.com/Totus-Floreo/asperitas-on-go/internal/model"
 	"github.com/redis/go-redis/v9"
 )
 
