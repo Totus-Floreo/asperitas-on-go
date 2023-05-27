@@ -5,15 +5,18 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
-	"github.com/Totus-Floreo/asperitas-on-go/pkg/application"
-	route "github.com/Totus-Floreo/asperitas-on-go/pkg/delivery/http"
-	"github.com/Totus-Floreo/asperitas-on-go/pkg/middleware"
-	inmemory "github.com/Totus-Floreo/asperitas-on-go/pkg/repository/inmemory"
-	"github.com/Totus-Floreo/asperitas-on-go/pkg/repository/pgx"
-	repositoryRedis "github.com/Totus-Floreo/asperitas-on-go/pkg/repository/redis"
+	"github.com/Totus-Floreo/asperitas-on-go/internal/application"
+	"github.com/Totus-Floreo/asperitas-on-go/internal/middleware"
+	mongo_repository "github.com/Totus-Floreo/asperitas-on-go/internal/repository/mongo"
+	pgx_repository "github.com/Totus-Floreo/asperitas-on-go/internal/repository/pgx"
+	redis_repository "github.com/Totus-Floreo/asperitas-on-go/internal/repository/redis"
+	route "github.com/Totus-Floreo/asperitas-on-go/internal/route/http"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
@@ -24,21 +27,52 @@ func main() {
 	defer zapLogger.Sync()
 	logger := zapLogger.Sugar()
 
+	// TODO: commandline settings for choose needed method of storage info
+	// method := flag.String("method", "db", "Specify the storage method")
+	// flag.Parse()
+	// if *method != "db" && *method != "inmemory" {
+	// 	flag.Usage()
+	// 	logger.Fatalln("Invalid method specified, use db or im")
+	// }
+	// userRepository := inmemory.NewUserStorage()
+	// postStorage := inmemory.NewPostStorage()
+
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     "localhost" + os.Getenv("redis"),
 		Password: "",
 		DB:       0,
 	})
-
-	postgreUrl := "postgres://" + os.Getenv("pg_url")
-	pgxdb, err := pgxpool.New(context.Background(), postgreUrl)
-	if err != nil {
-		panic(err)
+	if redisStatus := rdb.Ping(context.Background()); redisStatus.Err() != nil {
+		logger.Panicln("Redis connection error: ", redisStatus.Err().Error())
 	}
 
-	// userRepository := inmemory.NewUserStorage()
-	userRepository := pgx.NewUserStorage(pgxdb)
-	tokenRepository := repositoryRedis.NewTokenRepository(rdb)
+	postgreUrl := "postgres://" + os.Getenv("pg_uri")
+	pgxdb, err := pgxpool.New(context.Background(), postgreUrl)
+	if err != nil {
+		logger.Panicln("Postgre connection error: ", err.Error())
+	}
+
+	poolScheduler, err := mongo_repository.NewDBReadersPool(os.Getenv("mongo_uri"), 10)
+	if err != nil {
+		logger.Panicln("Mongo connection error: ", err.Error())
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	clientOptions := options.Client().ApplyURI(os.Getenv("mongo_uri"))
+	client, err := mongo.Connect(ctx, clientOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	userRepository := pgx_repository.NewUserStorage(pgxdb)
+	tokenRepository := redis_repository.NewTokenRepository(rdb)
 	JWTService := application.NewJWTService(os.Getenv("signature"))
 	authService := application.NewAuthService(userRepository, tokenRepository, JWTService)
 
@@ -47,7 +81,7 @@ func main() {
 		AuthService: authService,
 	}
 
-	postStorage := inmemory.NewPostStorage()
+	postStorage := mongo_repository.NewPostStorage(client, poolScheduler)
 	postService := application.NewPostService(postStorage)
 
 	postHandler := &route.PostHandler{
