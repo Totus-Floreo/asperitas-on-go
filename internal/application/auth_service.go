@@ -40,7 +40,7 @@ func (s *AuthService) SignUp(ctx context.Context, username string, password stri
 		return "", err
 	}
 
-	if err := s.tokenStorage.CreateToken(ctx, user.ID, token); err != nil {
+	if err := s.tokenStorage.SetToken(ctx, user.ID, token); err != nil {
 		return "", err
 	}
 	return token, nil
@@ -61,7 +61,7 @@ func (s *AuthService) LogIn(ctx context.Context, username, password string) (str
 		if err != nil {
 			return "", err
 		}
-		if err := s.tokenStorage.CreateToken(ctx, user.ID, token); err != nil {
+		if err := s.tokenStorage.SetToken(ctx, user.ID, token); err != nil {
 			return "", err
 		}
 		return token, nil
