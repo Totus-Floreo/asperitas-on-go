@@ -2,32 +2,24 @@ package pgx_repository
 
 import (
 	"context"
-	"log"
 
 	"github.com/Totus-Floreo/asperitas-on-go/internal/model"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type UserStorage struct {
-	connPool *pgxpool.Pool
+	connPool model.IPool
 }
 
-func NewUserStorage(connPool *pgxpool.Pool) *UserStorage {
+func NewUserStorage(connPool model.IPool) *UserStorage {
 	return &UserStorage{
 		connPool: connPool,
 	}
 }
 
 func (s *UserStorage) GetUser(ctx context.Context, username string) (*model.User, error) {
-	conn, err := s.connPool.Acquire(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Release()
-
-	tx, err := conn.Begin(ctx)
+	tx, err := s.connPool.Begin(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -51,14 +43,7 @@ func (s *UserStorage) GetUser(ctx context.Context, username string) (*model.User
 }
 
 func (s *UserStorage) AddUser(ctx context.Context, user *model.User) error {
-	conn, err := s.connPool.Acquire(ctx)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	defer conn.Release()
-
-	tx, err := conn.Begin(ctx)
+	tx, err := s.connPool.Begin(ctx)
 	if err != nil {
 		return err
 	}
