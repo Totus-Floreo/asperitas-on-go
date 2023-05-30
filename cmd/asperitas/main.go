@@ -9,10 +9,12 @@ import (
 
 	"github.com/Totus-Floreo/asperitas-on-go/internal/application"
 	"github.com/Totus-Floreo/asperitas-on-go/internal/middleware"
+	"github.com/Totus-Floreo/asperitas-on-go/internal/model"
 	mongo_repository "github.com/Totus-Floreo/asperitas-on-go/internal/repository/mongo"
 	pgx_repository "github.com/Totus-Floreo/asperitas-on-go/internal/repository/pgx"
 	redis_repository "github.com/Totus-Floreo/asperitas-on-go/internal/repository/redis"
 	route "github.com/Totus-Floreo/asperitas-on-go/internal/route/http"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -71,9 +73,13 @@ func main() {
 		}
 	}()
 
+	timeController := model.TimeControllerFunc(func() time.Time {
+		return time.Now()
+	})
+
 	userRepository := pgx_repository.NewUserStorage(pgxdb)
 	tokenRepository := redis_repository.NewTokenRepository(rdb)
-	JWTService := application.NewJWTService(os.Getenv("signature"))
+	JWTService := application.NewJWTService(os.Getenv("signature"), jwt.SigningMethodHS256, timeController)
 	authService := application.NewAuthService(userRepository, tokenRepository, JWTService)
 
 	userHandler := &route.UserHandler{

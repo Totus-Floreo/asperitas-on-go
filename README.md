@@ -52,6 +52,28 @@ export signature port redis pg_url
 go run ./cmd/asperitas/main.go
 ```
 
+### Tests
+```sh
+#To Test with coverage
+go test $(go list ./... | grep -v /test/) -coverprofile=overallcoverage ./...
+# rn test in same folder with code, it will moved back to ./test/...
+
+#To generate http
+go test -coverpkg=./internal/<funcional>/<type>/ -coverprofile=<package> ./test/<funcional>/<package>_test.go
+
+#To watch in http
+go tool cover -html=test/<funcional>/<package>
+```
+
+#### Mockgen
+```sh
+#If module have interface for needed struct
+mockgen --destination mocks/<interface>.go --package=mocks  --build_flags=--mod=mod <moduleURL> <interface>
+#If module haven't interface for needed struct
+#You need create interface that will implement struct ?? rewrite this later
+mockgen -source <your_hand_made_interface>_interface.go -destination mocks/<your_hand_made_interface>.go -package=mocks 
+```
+
 ## Thanks
 Thank [d11z](https://github.com/d11z/asperitas) for the idea and frontend.
 
