@@ -1,5 +1,6 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/Totus-Floreo/asperitas-on-go)](https://goreportcard.com/report/github.com/Totus-Floreo/asperitas-on-go)
 [![Go](https://github.com/Totus-Floreo/asperitas-on-go/actions/workflows/go.yml/badge.svg)](https://github.com/Totus-Floreo/asperitas/blob/main/.github/workflows/go.yml)
+[![Test](https://github.com/Totus-Floreo/asperitas-on-go/actions/workflows/test.yml/badge.svg)](https://github.com/Totus-Floreo/asperitas/blob/main/.github/workflows/test.yml)
 [![codecov](https://codecov.io/gh/Totus-Floreo/asperitas-on-go/branch/main/graph/badge.svg?token=X9I4VJAFRC)](https://codecov.io/gh/Totus-Floreo/asperitas-on-go)
 [![Status](https://badgen.net/badge/status/indevelopment/blue?icon=github)](https://github.com/Totus-Floreo/asperitas-on-go)
 [![MIT](https://badgen.net/badge/license/MIT/blue)](https://github.com/Totus-Floreo/asperitas-on-go/blob/main/LICENSE)
