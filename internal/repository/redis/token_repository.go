@@ -25,7 +25,7 @@ func (r *TokenRepository) GetToken(ctx context.Context, userID string) (string, 
 	return val, nil
 }
 
-func (r *TokenRepository) CreateToken(ctx context.Context, userID string, token string) error {
+func (r *TokenRepository) SetToken(ctx context.Context, userID string, token string) error {
 	err := r.rdb.SetNX(ctx, userID, token, time.Hour*24*7).Err()
 	if err != nil {
 		return err
