@@ -103,7 +103,7 @@ func main() {
 
 	api := router.PathPrefix("/api").Subrouter()
 	api.HandleFunc("/register", userHandler.SignUp).Methods("POST")
-	api.HandleFunc("/login", userHandler.Login).Methods("POST")
+	api.HandleFunc("/login", userHandler.LogIn).Methods("POST")
 	api.HandleFunc("/posts/", postHandler.GetAllPosts).Methods("GET")
 	api.HandleFunc("/posts/{category}", postHandler.GetPostsByCategory).Methods("GET")
 	api.HandleFunc("/post/{postID}", postHandler.GetPostByID).Methods("GET")
