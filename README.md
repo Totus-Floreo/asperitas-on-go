@@ -70,11 +70,13 @@ go tool cover -html=test/<funcional>/<package>
 #### Mockgen
 ```sh
 #If module have interface for needed struct
-mockgen --destination mocks/<interface>.go --package=mocks  --build_flags=--mod=mod <moduleURL> <interface>
+mockgen --destination ./internal/model/mocks/<interface>.go --package=mocks  --build_flags=--mod=mod <moduleURL> <interface>
 #If module haven't interface for needed struct
 #You need create interface that will implement struct ?? rewrite this later
-mockgen -source <your_hand_made_interface>_interface.go -destination mocks/<your_hand_made_interface>.go -package=mocks 
+mockgen -source ./internal/model/<your_hand_made_interface>.go -destination ./internal/model/mocks/<your_hand_made_interface>.go -package=mocks 
 ```
+
+P.S. I use camelCase in names of mocks, as for all generated files for convenience.
 
 ## Thanks
 Thank [d11z](https://github.com/d11z/asperitas) for the idea and frontend.
