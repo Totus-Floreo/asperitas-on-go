@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Totus-Floreo/asperitas-on-go/internal/application"
 	"github.com/Totus-Floreo/asperitas-on-go/internal/model"
 	"github.com/Totus-Floreo/asperitas-on-go/internal/route/helpers"
 
@@ -13,7 +12,7 @@ import (
 
 type UserHandler struct {
 	Logger      *zap.SugaredLogger
-	AuthService *application.AuthService
+	AuthService model.IAuthService
 }
 
 func (h *UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
@@ -23,6 +22,11 @@ func (h *UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, helpers.HTTPError(err), http.StatusBadRequest)
 		return
 	}
+	if user.Username == "" || user.Password == "" {
+		http.Error(w, helpers.HTTPError(model.ErrInvalidCredentialsHTTP), http.StatusBadRequest)
+		return
+	}
+
 	ctx := r.Context()
 	token, err := h.AuthService.SignUp(ctx, user.Username, user.Password)
 	if err == model.ErrUserExist {
@@ -44,11 +48,15 @@ func (h *UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) LogIn(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	user := new(model.User)
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		http.Error(w, helpers.HTTPError(err), http.StatusBadRequest)
+		return
+	}
+	if user.Username == "" || user.Password == "" {
+		http.Error(w, helpers.HTTPError(model.ErrInvalidCredentialsHTTP), http.StatusBadRequest)
 		return
 	}
 

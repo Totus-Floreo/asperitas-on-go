@@ -90,6 +90,11 @@ func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, helpers.HTTPError(err), http.StatusBadRequest)
 		return
 	}
+	if post.Text == "" || post.Title == "" {
+		http.Error(w, helpers.HTTPError(model.ErrPostInvalidHTTP), http.StatusBadRequest)
+		return
+	}
+
 	response, err := h.PostService.AddPost(r.Context(), post)
 	if err == model.ErrInvalidUrl {
 		msg, err := model.NewErrorStack("body", "url", post.Url, "is invalid")
@@ -116,6 +121,7 @@ func (h *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, model.ErrPostInvalidHTTP.Error(), http.StatusUnprocessableEntity)
 		return
 	}
+
 	err := h.PostService.DeletePost(r.Context(), postID)
 	if err != nil {
 		http.Error(w, helpers.HTTPError(err), http.StatusNotFound)
