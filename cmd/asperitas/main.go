@@ -61,6 +61,7 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
 	clientOptions := options.Client().ApplyURI(os.Getenv("mongo_uri"))
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
@@ -72,6 +73,10 @@ func main() {
 			log.Fatal(err)
 		}
 	}()
+
+	mongoClient := model.MyMongoClient{
+		Client: client,
+	}
 
 	timeController := model.TimeControllerFunc(func() time.Time {
 		return time.Now()
@@ -87,7 +92,7 @@ func main() {
 		AuthService: authService,
 	}
 
-	postStorage := mongo_repository.NewPostStorage(client, poolScheduler)
+	postStorage := mongo_repository.NewPostStorage(mongoClient, poolScheduler)
 	postService := application.NewPostService(postStorage)
 
 	postHandler := &route.PostHandler{

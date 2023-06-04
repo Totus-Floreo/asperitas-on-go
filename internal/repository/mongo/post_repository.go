@@ -12,13 +12,13 @@ import (
 )
 
 type PostStorage struct {
-	PostStorage    *mongo.Collection
-	CommentStorage *mongo.Collection
+	PostStorage    model.ICollection
+	CommentStorage model.ICollection
 	mu             *sync.Mutex
-	ReadersPool    *DBReadersPool
+	ReadersPool    model.IDBReadersPool
 }
 
-func NewPostStorage(client *mongo.Client, pool *DBReadersPool) *PostStorage {
+func NewPostStorage(client model.IClient, pool model.IDBReadersPool) *PostStorage {
 	db := client.Database("asperitas")
 	postStorage := db.Collection("posts")
 	commentStorage := db.Collection("comments")

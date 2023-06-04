@@ -4,17 +4,18 @@ import (
 	"context"
 	"time"
 
+	"github.com/Totus-Floreo/asperitas-on-go/internal/model"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type DBReadersPool struct {
-	connections chan *mongo.Client
+	connections chan model.IClient
 }
 
 func NewDBReadersPool(uri string, maxConn int) (*DBReadersPool, error) {
 	pool := &DBReadersPool{
-		connections: make(chan *mongo.Client, maxConn),
+		connections: make(chan model.IClient, maxConn),
 	}
 
 	for i := 0; i < maxConn; i++ {
@@ -31,16 +32,20 @@ func NewDBReadersPool(uri string, maxConn int) (*DBReadersPool, error) {
 			return nil, err
 		}
 
-		pool.connections <- client
+		myClient := model.MyMongoClient{
+			Client: client,
+		}
+
+		pool.connections <- myClient
 	}
 
 	return pool, nil
 }
 
-func (p *DBReadersPool) GetConnection() *mongo.Client {
+func (p *DBReadersPool) GetConnection() model.IClient {
 	return <-p.connections
 }
 
-func (p *DBReadersPool) ReleaseConnection(conn *mongo.Client) {
+func (p *DBReadersPool) ReleaseConnection(conn model.IClient) {
 	p.connections <- conn
 }
